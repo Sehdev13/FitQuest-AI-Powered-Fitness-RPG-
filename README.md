@@ -113,7 +113,7 @@ Users can log workouts via Quick Log (`Bench Press 3×10×80` format) or a Detai
 
 ### 7. Personal Records System
 
-Every time a user logs a weight higher than their previous best on any exercise, the app automatically detects the PR, shows a confetti celebration modal, awards +30 bonus XP, and saves the record with date and improvement amount. The PR tab shows all-time bests per exercise with gold cards and 🆕 badges for PRs set in the last 3 days.
+Every time a user logs a weight higher than their previous best on any exercise, the app automatically detects the PR, shows a confetti celebration modal, awards +30 bonus XP, and saves the record with date and improvement amount. The PR tab shows all-time bests per exercise with gold cards and new badges for PRs set in the last 3 days.
 
 ---
 
@@ -135,7 +135,7 @@ A fully hand-coded SVG character renders in the right panel and evolves visually
 
 ### 9. Friends & Leaderboard System
 
-Every user gets a unique `FQ-XXXXX` code on signup. Users share their code, send friend requests, accept or decline — and once connected, appear on a leaderboard ranked by level showing streak and best PR lift. Gold, silver, and bronze medals are awarded to the top 3 players.
+Every user gets a unique `FQ-XXXXX` code on signup. Users share their code, send friend requests, accept or decline, and once connected, appear on a leaderboard ranked by level, showing streak and best PR lift. Gold, silver, and bronze medals are awarded to the top 3 players.
 
 ---
 
@@ -203,7 +203,7 @@ python main.py
 
 ## Roadmap
 
-- [ ] PWA support — installable on phone home screen
+- [ ] PWA support - installable on phone home screen
 - [ ] Body measurements tracker with progress graphs
 - [ ] Built-in workout rest timer
 - [ ] ARIA voice mode using Web Speech API
