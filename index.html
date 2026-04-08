@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FitQuest - AI Fitness RPG</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>"/>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<!-- ── LOGIN ── -->
+<div id="screen-login" class="screen active">
+  <video id="bgVideo" autoplay muted loop playsinline
+    style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0;">
+    <source src="fitquest-intro2.mp4" type="video/mp4">
+  </video>
+  <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0.1) 0%,rgba(0,0,0,0.45) 50%,rgba(0,0,0,0.88) 100%);z-index:1;"></div>
+
+  <div class="login-center">
+    <div class="fq-logo-wrap">
+      <div class="fq-logo-icon">
+        <svg width="72" height="72" viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">
+          <rect x="8"  y="30" width="12" height="12" rx="4" fill="#FF6B00"/>
+          <rect x="3"  y="26" width="7"  height="20" rx="3" fill="#FF9940"/>
+          <rect x="52" y="30" width="12" height="12" rx="4" fill="#FF6B00"/>
+          <rect x="62" y="26" width="7"  height="20" rx="3" fill="#FF9940"/>
+          <rect x="20" y="32" width="32" height="8"  rx="4" fill="#FF6B00"/>
+          <polygon points="41,6 30,34 37,34 33,66 44,30 37,30" fill="#FFD700" opacity="0.95"/>
+        </svg>
+      </div>
+      <div class="fq-logo-text">
+        <span class="fq-fit">FIT</span><span class="fq-quest">QUEST</span>
+      </div>
+      <div class="fq-logo-sub">AI-POWERED FITNESS RPG</div>
+    </div>
+
+    <div class="fq-divider"></div>
+
+    <div class="fq-quote-wrap">
+      <div class="fq-quote" id="fqQuote"></div>
+      <div class="fq-quote-author" id="fqAuthor"></div>
+    </div>
+
+    <div class="fq-badges">
+      <div class="fq-badge">🔥 Daily XP</div>
+      <div class="fq-badge">⚡ ARIA AI Coach</div>
+      <div class="fq-badge">🏆 Personal Records</div>
+      <div class="fq-badge">👥 Friends</div>
+    </div>
+
+    <div class="fq-cta">Sign in to start your quest →</div>
+
+    <div class="fq-badge fq-google-pill" onclick="window.googleLogin()">
+      <svg width="16" height="16" viewBox="0 0 48 48" style="flex-shrink:0;">
+        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.35-8.16 2.35-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- ── ONBOARDING ── -->
+<div id="screen-onboard" class="screen">
+  <div class="ob-step active" id="ob1">
+    <div class="step-label">STEP 1 OF 3</div>
+    <div class="ob-title">NAME YOUR HERO</div>
+    <div class="ob-sub">ARIA will learn your patterns and coach you over time.</div>
+    <label class="field-label">HERO NAME</label>
+    <input class="ob-input" id="heroName" placeholder="Enter your name..." maxlength="20"/>
+    <label class="field-label" style="margin-top:1.2rem;">FITNESS GOAL</label>
+    <button class="opt-btn" onclick="selOpt(this,'goal','lose_weight')">🔥 Lose Weight & Get Lean</button>
+    <button class="opt-btn" onclick="selOpt(this,'goal','build_muscle')">💪 Build Muscle & Strength</button>
+    <button class="opt-btn" onclick="selOpt(this,'goal','endurance')">🏃 Improve Endurance & Cardio</button>
+    <button class="opt-btn" onclick="selOpt(this,'goal','general')">⚡ General Fitness & Health</button>
+    <button class="btn-primary" onclick="nextOb(2)">NEXT →</button>
+  </div>
+  <div class="ob-step" id="ob2">
+    <div class="step-label">STEP 2 OF 3</div>
+    <div class="ob-title">CHOOSE BATTLE DAYS</div>
+    <div class="ob-sub">ARIA will optimize rest days to prevent overtraining.</div>
+    <div class="days-grid">
+      <div class="day-btn" onclick="toggleDay(this,'Mon')">MON</div>
+      <div class="day-btn" onclick="toggleDay(this,'Tue')">TUE</div>
+      <div class="day-btn" onclick="toggleDay(this,'Wed')">WED</div>
+      <div class="day-btn" onclick="toggleDay(this,'Thu')">THU</div>
+      <div class="day-btn" onclick="toggleDay(this,'Fri')">FRI</div>
+      <div class="day-btn" onclick="toggleDay(this,'Sat')">SAT</div>
+      <div class="day-btn" onclick="toggleDay(this,'Sun')">SUN</div>
+    </div>
+    <label class="field-label" style="margin-top:1rem;">FITNESS LEVEL</label>
+    <button class="opt-btn" onclick="selOpt(this,'level','beginner')">🌱 Beginner — Just starting out</button>
+    <button class="opt-btn" onclick="selOpt(this,'level','intermediate')">🌿 Intermediate — Some experience</button>
+    <button class="opt-btn" onclick="selOpt(this,'level','advanced')">🔥 Advanced — I train hard</button>
+    <button class="btn-primary" onclick="nextOb(3)">NEXT →</button>
+    <button class="btn-secondary" onclick="nextOb(1)">← Back</button>
+  </div>
+  <div class="ob-step" id="ob3">
+    <div class="step-label">STEP 3 OF 3</div>
+    <div class="ob-title">CHOOSE YOUR DOJO</div>
+    <div class="ob-sub">ARIA recommendations will match your equipment.</div>
+    <button class="opt-btn" onclick="selOpt(this,'equip','full_gym')">🏋️ Full Gym — All equipment</button>
+    <button class="opt-btn" onclick="selOpt(this,'equip','home_dumbbells')">🏠 Home + Dumbbells</button>
+    <button class="opt-btn" onclick="selOpt(this,'equip','bodyweight')">🤸 Bodyweight Only</button>
+    <button class="btn-primary" onclick="startApp()">⚔️ BEGIN QUEST + ACTIVATE ARIA!</button>
+    <button class="btn-secondary" onclick="nextOb(2)">← Back</button>
+  </div>
+</div>
+
+<!-- ── DASHBOARD ── -->
+<div id="screen-dashboard" class="screen">
+
+  <div class="topbar">
+    <div class="app-title">FIT QUEST</div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="ml-status" id="mlStatus">ML READY</div>
+      <div class="aria-status-pill">⚡ ARIA</div>
+      <div class="streak-display">🔥 <span id="streakCnt">0</span></div>
+      <div class="user-badge" id="userBadge"></div>
+    </div>
+  </div>
+
+  <!-- MOBILE AVATAR STRIP -->
+  <div class="mobile-avatar-strip">
+    <div class="mobile-avatar-svg" id="mobileAvatarSvg"></div>
+    <div class="mobile-avatar-info">
+      <div class="mobile-avatar-name" id="mobileAvatarName">HERO</div>
+      <div class="mobile-avatar-cls" id="mobileAvatarCls">NOVICE WARRIOR</div>
+      <div class="mobile-avatar-lvl">LV <span id="mobileAvatarLvl">0</span></div>
+    </div>
+    <div class="mobile-avatar-right">
+      <div class="mobile-xp-label"><span>XP</span><span id="mobileXpTxt">0/100</span></div>
+      <div class="xp-bar"><div class="xp-fill" id="mobileXpFill" style="width:0%"></div></div>
+      <div class="mobile-streak">🔥 <span id="mobileStreakCnt">0</span> day streak</div>
+    </div>
+  </div>
+
+  <div class="split-layout">
+    <!-- LEFT PANEL -->
+    <div class="left-panel">
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-icon">🏋️</div><div class="stat-val" id="stW">0</div><div class="stat-lbl">Workouts</div></div>
+        <div class="stat-card"><div class="stat-icon">🔥</div><div class="stat-val" id="stS">0</div><div class="stat-lbl">Streak</div></div>
+        <div class="stat-card"><div class="stat-icon">⚡</div><div class="stat-val" id="stX">0</div><div class="stat-lbl">Total XP</div></div>
+        <div class="stat-card"><div class="stat-icon">🏆</div><div class="stat-val" id="stPR">0</div><div class="stat-lbl">PRs</div></div>
+      </div>
+
+      <!-- DESKTOP TABS -->
+      <div class="nav-tabs desktop-tabs">
+        <div class="nav-tab active" onclick="switchTab('today',this)">TODAY</div>
+        <div class="nav-tab" onclick="switchTab('log',this)">LOG</div>
+        <div class="nav-tab aria-tab" onclick="switchTab('aria',this)">⚡ ARIA</div>
+        <div class="nav-tab" onclick="switchTab('ml',this)">AI COACH</div>
+        <div class="nav-tab" onclick="switchTab('prs',this)">🏆 PRs</div>
+        <div class="nav-tab" onclick="switchTab('friends',this)">👥 FRIENDS</div>
+        <div class="nav-tab" onclick="switchTab('schedule',this)">SCHEDULE</div>
+        <div class="nav-tab" onclick="switchTab('badges',this)">BADGES</div>
+      </div>
+
+      <!-- TODAY -->
+      <div class="tab-panel active" id="tab-today">
+        <div class="phase-banner" id="phaseBanner"></div>
+        <div class="today-card">
+          <div class="today-label">⚔️ TODAY'S TRAINING</div>
+          <div id="todayContent"></div>
+        </div>
+        <div class="section-title">WEEKLY PROGRESS</div>
+        <div class="streak-row" id="weekStreak"></div>
+      </div>
+
+      <!-- LOG -->
+      <div class="tab-panel" id="tab-log">
+        <div class="section-title" style="margin-bottom:.5rem;">LOG WORKOUT</div>
+        <div class="log-card">
+          <div class="log-card-title">⚡ QUICK LOG</div>
+          <div class="ob-sub" style="margin-bottom:8px;">Format: Exercise · Sets × Reps × Weight(kg)</div>
+          <input class="ob-input" id="quickLogInput" placeholder="e.g. Bench Press 3×10×80"/>
+          <button class="btn-primary" style="margin-top:6px;" onclick="quickLog()">ADD TO LOG</button>
+        </div>
+        <div class="log-card" style="margin-top:10px;">
+          <div class="log-card-title">📋 DETAILED LOG</div>
+          <input class="ob-input" id="detailExName" placeholder="Exercise name (e.g. Squat)"/>
+          <div id="setsContainer"></div>
+          <button class="btn-add-set" onclick="addSet()">+ ADD SET</button>
+          <button class="btn-primary" style="margin-top:8px;" onclick="saveDetailLog()">SAVE EXERCISE</button>
+        </div>
+        <div class="log-card" style="margin-top:10px;">
+          <div class="log-card-title">📊 TODAY'S LOG</div>
+          <div id="todayLogDisplay"></div>
+        </div>
+        <div class="log-card" style="margin-top:10px;">
+          <div class="log-card-title">📈 VS LAST SESSION</div>
+          <div id="perfCompareContent"></div>
+        </div>
+      </div>
+
+      <!-- ARIA -->
+      <div class="tab-panel" id="tab-aria">
+        <div class="aria-header">
+          <div class="aria-avatar-wrap">
+            <div class="aria-avatar">
+              <svg width="28" height="28" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="14" cy="14" r="14" fill="#FF6B00" opacity="0.15"/>
+                <polygon points="14,4 10,14 13,14 11,24 18,12 15,12" fill="#FF6B00"/>
+                <circle cx="14" cy="14" r="3" fill="#FFD700" opacity="0.8"/>
+              </svg>
+            </div>
+            <div>
+              <div class="aria-name">ARIA</div>
+              <div class="aria-tagline">Adaptive Recovery & Intelligence Assistant</div>
+            </div>
+          </div>
+          <div class="aria-online-dot"></div>
+        </div>
+        <div class="aria-chat-box" id="ariaChatBox"></div>
+        <div class="aria-suggestions" id="ariaSuggestions">
+          <div class="aria-chip" onclick="ariaQuickAsk(this)">Why is my bench press not improving?</div>
+          <div class="aria-chip" onclick="ariaQuickAsk(this)">Update my plan for next 2 weeks</div>
+          <div class="aria-chip" onclick="ariaQuickAsk(this)">I have a knee injury, modify my schedule</div>
+          <div class="aria-chip" onclick="ariaQuickAsk(this)">Am I overtraining?</div>
+          <div class="aria-chip" onclick="ariaQuickAsk(this)">What should I eat today?</div>
+          <div class="aria-chip" onclick="ariaQuickAsk(this)">How do I break a plateau?</div>
+        </div>
+        <div class="aria-input-row">
+          <input class="aria-input" id="ariaInput" placeholder="Ask ARIA anything..."
+            onkeydown="if(event.key==='Enter')sendAriaMessage()"/>
+          <button class="aria-send-btn" onclick="sendAriaMessage()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M22 2L11 13" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+              <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- AI COACH -->
+      <div class="tab-panel" id="tab-ml">
+        <div id="mlLoadingBlock" class="loading-ml">
+          TRAINING ON-DEVICE MODEL
+          <div class="loading-bar"><div class="loading-fill"></div></div>
+        </div>
+        <div id="mlReadyBlock" style="display:none;">
+          <div class="ml-card blue"><div class="ml-card-title">🤖 SMART RECOMMENDATIONS</div><div id="recList"></div></div>
+          <div class="ml-card green"><div class="ml-card-title">⚙️ ADAPTIVE DIFFICULTY</div><div id="diffContent"></div></div>
+          <div class="ml-card purple">
+            <div class="ml-card-title">📈 PROGRESS FORECAST</div>
+            <div id="forecastContent"></div>
+            <div style="position:relative;height:130px;margin-top:8px;"><canvas id="forecastChart"></canvas></div>
+          </div>
+          <div class="ml-card blue" style="margin-top:8px;"><div class="ml-card-title">💪 NEXT SESSION TARGETS</div><div id="nextTargets"></div></div>
+        </div>
+      </div>
+
+      <!-- PERSONAL RECORDS -->
+      <div class="tab-panel" id="tab-prs">
+        <div class="section-title">🏆 PERSONAL RECORDS</div>
+        <div class="pr-summary-row" id="prSummaryRow"></div>
+        <div class="pr-grid" id="prGrid">
+          <div style="color:var(--mt);font-size:12px;padding:1rem 0;text-align:center;">Log workouts to start tracking your PRs automatically! 💪</div>
+        </div>
+      </div>
+
+      <!-- FRIENDS -->
+      <div class="tab-panel" id="tab-friends">
+        <div class="section-title">👥 FRIENDS</div>
+        <div class="friend-code-card">
+          <div class="friend-code-label">YOUR FITQUEST CODE</div>
+          <div class="friend-code-display" id="myFriendCode">FQ-······</div>
+          <div class="friend-code-sub">Share this code so friends can find you</div>
+          <button class="friend-copy-btn" onclick="copyFriendCode()">📋 Copy Code</button>
+        </div>
+        <div class="friend-add-card">
+          <div class="log-card-title">ADD A FRIEND</div>
+          <div style="display:flex;gap:8px;">
+            <input class="ob-input" id="friendCodeInput" placeholder="Enter FitQuest code (e.g. FQ-X7K2M)" style="margin:0;flex:1;"/>
+            <button class="aria-send-btn" style="border-radius:12px;width:44px;height:44px;" onclick="sendFriendRequest()">➕</button>
+          </div>
+          <div id="friendRequestStatus" style="font-size:11px;margin-top:6px;"></div>
+        </div>
+        <div id="friendRequestsSection" style="display:none;">
+          <div class="section-title" style="font-size:13px;margin-top:8px;">PENDING REQUESTS</div>
+          <div id="friendRequestsList"></div>
+        </div>
+        <div class="section-title" style="margin-top:8px;">LEADERBOARD</div>
+        <div id="friendsLeaderboard">
+          <div style="color:var(--mt);font-size:12px;padding:1rem 0;text-align:center;">Add friends to see the leaderboard! 👥</div>
+        </div>
+      </div>
+
+      <!-- SCHEDULE -->
+      <div class="tab-panel" id="tab-schedule">
+        <div class="section-title">TRAINING SCHEDULE</div>
+        <div id="schedWrap"></div>
+      </div>
+
+      <!-- BADGES -->
+      <div class="tab-panel" id="tab-badges">
+        <div class="section-title">BATTLE TROPHIES</div>
+        <div class="ach-grid" id="achGrid"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+      <div class="avatar-stage">
+        <div class="aura-container" id="auraContainer"></div>
+        <div class="avatar-svg" id="avatarSvg"></div>
+        <div class="avatar-nameplate">
+          <div class="avatar-hero-name" id="avatarName">HERO</div>
+          <div class="avatar-lvl-badge">LV <span id="avatarLvl">0</span></div>
+          <div class="avatar-cls" id="avatarCls">NOVICE WARRIOR</div>
+        </div>
+        <div style="width:100%;padding:0 .8rem;">
+          <div class="xp-label-row"><span>XP</span><span id="xpTxt">0 / 100</span></div>
+          <div class="xp-bar"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
+        </div>
+        <div class="body-stats" id="bodyStats"></div>
+        <div class="gear-row" id="gearRow"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOBILE BOTTOM NAV -->
+  <nav class="mobile-bottom-nav" id="mobileBottomNav">
+    <div class="mobile-nav-item active" id="mnav-today" onclick="mobileSwitchTab('today',this)">
+      <div class="mobile-nav-icon">🏠</div>
+      <div class="mobile-nav-label">Today</div>
+    </div>
+    <div class="mobile-nav-item" id="mnav-log" onclick="mobileSwitchTab('log',this)">
+      <div class="mobile-nav-icon">📋</div>
+      <div class="mobile-nav-label">Log</div>
+    </div>
+    <div class="mobile-nav-item" id="mnav-aria" onclick="mobileSwitchTab('aria',this)">
+      <div class="mobile-nav-icon aria-nav-icon">⚡</div>
+      <div class="mobile-nav-label">ARIA</div>
+    </div>
+    <div class="mobile-nav-item" id="mnav-prs" onclick="mobileSwitchTab('prs',this)">
+      <div class="mobile-nav-icon">🏆</div>
+      <div class="mobile-nav-label">PRs</div>
+    </div>
+    <div class="mobile-nav-item" id="mnav-friends" onclick="mobileSwitchTab('friends',this)">
+      <div class="mobile-nav-icon">👥</div>
+      <div class="mobile-nav-label">Friends</div>
+    </div>
+    <div class="mobile-nav-item" id="mnav-more" onclick="mobileSwitchTab('schedule',this)">
+      <div class="mobile-nav-icon">📅</div>
+      <div class="mobile-nav-label">More</div>
+    </div>
+  </nav>
+
+  <!-- PR MODAL -->
+  <div class="modal-overlay" id="prModal">
+    <div class="pr-modal">
+      <div class="pr-modal-title">NEW PR! 🏆</div>
+      <div class="pr-modal-exercise" id="prModalExercise">Bench Press</div>
+      <div class="pr-modal-weight" id="prModalWeight">100kg</div>
+      <div class="pr-modal-sub" id="prModalSub">+5kg from previous best</div>
+      <div class="pr-confetti" id="prConfetti"></div>
+      <button class="btn-primary" onclick="closePRModal()">LETS GO! 💪</button>
+    </div>
+  </div>
+
+  <!-- LEVEL UP MODAL -->
+  <div class="modal-overlay" id="luModal">
+    <div class="levelup-modal">
+      <div class="lu-title">LEVEL UP!</div>
+      <div class="lu-sprite" id="luSprite"></div>
+      <div class="lu-level">LV <span id="luLvl">1</span></div>
+      <div class="lu-class" id="luClsModal">IRON TRAINEE</div>
+      <div id="luGearUnlock" style="font-size:12px;color:var(--gd);margin-bottom:6px;"></div>
+      <div class="lu-msg">Your power grows. ARIA adapts!</div>
+      <button class="btn-primary" onclick="closeLU()">CONTINUE ⚡</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const QUOTES=[
+  {q:'THE PAIN YOU FEEL TODAY IS THE STRENGTH YOU FEEL TOMORROW',a:'— Arnold Schwarzenegger'},
+  {q:'NO PAIN, NO GAIN. SHUT UP AND TRAIN.',a:'— Gym Wisdom'},
+  {q:'YOUR BODY CAN STAND ALMOST ANYTHING. IT\'S YOUR MIND YOU HAVE TO CONVINCE.',a:'— Unknown'},
+  {q:'WAKE UP. WORK OUT. LEVEL UP.',a:'— FitQuest'},
+  {q:'THE ONLY BAD WORKOUT IS THE ONE THAT DIDN\'T HAPPEN.',a:'— Unknown'},
+  {q:'SWEAT IS JUST FAT CRYING.',a:'— Gym Wisdom'},
+  {q:'CHAMPIONS AREN\'T BORN. THEY\'RE BUILT.',a:'— FitQuest'},
+  {q:'FALL IN LOVE WITH THE PROCESS AND THE RESULTS WILL COME.',a:'— Eric Thomas'},
+  {q:'IT NEVER GETS EASIER. YOU JUST GET STRONGER.',a:'— Unknown'},
+  {q:'EVERY REP. EVERY SET. EVERY DAY.',a:'— FitQuest'},
+  {q:'THE BODY ACHIEVES WHAT THE MIND BELIEVES.',a:'— Napoleon Hill'},
+  {q:'DISCIPLINE IS DOING IT EVEN WHEN YOU DON\'T FEEL LIKE IT.',a:'— Gym Wisdom'},
+];
+let qi=Math.floor(Math.random()*QUOTES.length);
+function cycleQuote(){
+  const q=QUOTES[qi%QUOTES.length];
+  const qEl=document.getElementById('fqQuote'),aEl=document.getElementById('fqAuthor');
+  if(qEl)qEl.textContent=q.q;if(aEl)aEl.textContent=q.a;qi++;
+}
+cycleQuote();setInterval(cycleQuote,4500);
+</script>
+<script src="ml.js" type="module"></script>
+<script src="app.js" type="module"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "ml-backend/**",
+      "**/*.py",
+      "**/*.pyc",
+      "**/__pycache__/**",
+      "**/*.exe",
+      "**/*.sh",
+      "**/*.bat",
+      "venv/**",
+      "**/venv/**",
+      "**/Scripts/**",
+      "**/Lib/**"
+    ]
+  }
+}
