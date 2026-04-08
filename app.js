@@ -9,7 +9,7 @@ const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const GROQ_MODEL   = 'llama-3.3-70b-versatile';
 
 const firebaseConfig = {
-    apiKey:"AIzaSyB4Ov4KQXzQeDymMBm9cxwGxTcYyoc5bjM",
+    apiKey:"",
     authDomain:"fitquest-1b34d.firebaseapp.com",
     projectId:"fitquest-1b34d",
     storageBucket:"fitquest-1b34d.firebasestorage.app",
